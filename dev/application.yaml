@@ -1,36 +1,29 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
-  name: robot-api1-deployment1
+  name: automation-deployment-test-dev1
+  namespace: test-dev
   labels:
-    app: robot-api1
+    app: automation-test-dev
 spec:
-  serviceName: robot-api1
   replicas: 1
   selector:
     matchLabels:
-      app: robot-api1
+      app: automation-test-dev
   template:
     metadata:
       labels:
-        app: robot-api1
+        app: automation-test-dev
     spec:
-      tolerations:
-        - key: backup-node-1
-          operator: Equal
-          value: backups-only
-          effect: NoSchedule
       containers:
-        - name: robot-api1
-          image: UbilityCR.azurecr.io/robot-api1:V18
+        - name: automation-test-dev
+          image: ubilitycr.azurecr.io/dev-automation:V1
           imagePullPolicy: Always
           ports:
             - containerPort: 80
-          lifecycle:
-              postStart:
-               exec:
-                 command: [ "sleep","10s"]
-                 command: [ "service","ssh","start"]
-                 command: [ "service","nginx","start"]
-                 command: [ "sshpass","-p","Ubility2022","ssh-copy-id","-o","StrictHostKeyChecking=no","root@robot-server-service"]
-
+      dnsPolicy: ClusterFirst
+      tolerations:
+      - key: backup-node-1
+        operator: Equal
+        value: backups-only
+        effect: NoSchedule

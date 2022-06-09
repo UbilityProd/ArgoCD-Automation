@@ -1,1 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: robot-api1-deployment1
+  labels:
+    app: robot-api1
+spec:
+  serviceName: robot-api1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: robot-api1
+  template:
+    metadata:
+      labels:
+        app: robot-api1
+    spec:
+      tolerations:
+        - key: backup-node-1
+          operator: Equal
+          value: backups-only
+          effect: NoSchedule
+      containers:
+        - name: robot-api1
+          image: UbilityCR.azurecr.io/robot-api1:V18
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          lifecycle:
+              postStart:
+               exec:
+                 command: [ "sleep","10s"]
+                 command: [ "service","ssh","start"]
+                 command: [ "service","nginx","start"]
+                 command: [ "sshpass","-p","Ubility2022","ssh-copy-id","-o","StrictHostKeyChecking=no","root@robot-server-service"]
 
